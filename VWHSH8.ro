@@ -1,0 +1,50 @@
+%RO Routine Output Utility
+GT.M 19-SEP-2012 17:42:36
+VWHSH8
+XUSHSH  ;IA/GpZ-ROBUST(PBKDF2)HASHING UTILITY v1.0; 9/19/12 5:40pm
+V       ;;8.0;KERNEL;;Jul 10, 1995
+        ;
+A       Set X=$$EN(X) Quit
+        ;
+EN(X)   New PYTHON,PARAMS Set PARAMS=""
+        ;
+        Xecute ^VA(200,"VWHSH")
+        Quit:PARAMS="" X
+        Quit $$CMD(PYTHON,PARAMS,X)
+        ;
+        ; ------------------------------------------
+CMD(PYTHON,Z,X) ; [Location of python xushsh.py],[hash details],X
+        New D,Y,CMD
+        Set D="$" Do
+        . Set CMD=PYTHON_" --password="_""""_X_""""
+        . Set Y=$P(Z,D,1) S:$L(Y) CMD=CMD_" --hash="_Y
+        . Set Y=$P(Z,D,2) S:$L(Y) CMD=CMD_" --salt="_Y
+        . Set Y=$P(Z,D,3) S:$L(Y) CMD=CMD_" --iterations="_+Y
+        . Set Y=$P(Z,D,4) S:$L(Y) CMD=CMD_" --keylen="_Y
+        . Set Y=$P(Z,D,5) S:$L(Y) CMD=CMD_" --function="_Y
+        . Quit
+        Quit $$HOSTPIPE(CMD)
+        ;
+        ; -----------GT.M-PIPE-Magic----------------
+HOSTPIPE(COMMAND) ;
+        New X
+        Open "PIPE":(command=COMMAND:READONLY)::"PIPE"
+        Use "PIPE" READ X
+        Close "PIPE"
+        Use 0
+        QUIT X
+        ;
+        ;------------------------------------------------------------------------
+        ; Copyright (c) 2012 John Leo Zimmer      Email: johnleozim@gmail.com    ;
+        ; All rights reserved.                                  Glenwood, Iowa   ;
+        ;                                                                        ;
+        ; This program is free software: you can redistribute it and/or modify   ;
+        ; it under the terms of the GNU Affero General Public License as         ;
+        ; published by the Free Software Foundation, either version 3 of the     ;
+        ; License, or (at your option) any later version.                        ;
+        ;                                                                        ;
+        ; See COPY in distribution package or <http://www.gnu.org/licenses/>.    ;
+        ;------------------------------------------------------------------------
+
+
+
