@@ -23,7 +23,7 @@ EN(X)   ;
         QUIT $$HOSTPIPE(VWCALL)
         ;
         ; -----------Cache-PIPE-WaveWand------------
-HOSTPIPE(CALL) ;
+OS(CALL) ;
         New ZUT,X
         Set ZUT=$ZUTIL(68,40,1)
         Open CALL:"Q"  Use CALL Read X
