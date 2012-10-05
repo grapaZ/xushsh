@@ -23,7 +23,7 @@ EN(X)   ;
         QUIT $$HOSTPIPE(VWCALL)
         ;
         ; -----------GT.M-PIPE-Magic----------------
-HOSTPIPE(CALL) ;
+OS(CALL) ;
         New X
         Open "PIPE":(command=CALL:READONLY)::"PIPE"
         Use "PIPE" READ X
