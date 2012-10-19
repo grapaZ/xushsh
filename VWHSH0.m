@@ -1,4 +1,4 @@
-VWHSH0  ;IOWA/GpZ- IMPROVED HASHING UTILITY v0.9 MAIN INSTALL MODULE; 10/2/12 10:42am
+VWHSH0  ;IOWA/GpZ- IMPROVED HASHING UTILITY v0.9 MAIN INSTALL MODULE; 10/17/12;
 V       ;;8.0;KERNEL;;Jul 10, 1995
         ;;
         ; -------------------------------------
@@ -98,16 +98,12 @@ KILL    ;
         . Quit
         Quit
         ;
-CONVERT ; Allows "NONE" or "PBKDF2"
-        ;New %H,X,Y,Z,HSH,ACODE,AOLD,FROM,VCODE,VOLD,D0,NODE,NOW,XT
+CONVERT(TOHASH) ; Allows "NONE" or "PBKDF2"
+        New %H,X,Y,Z,HSH,ACODE,AOLD,FROM,VCODE,VOLD,D0,NODE,NOW,XT
         Do TEST^VWHSH0
         Set FROMHASH=HASH
-        Set TOHASH="NONE"
-        ;;Set X="test"
-        X ^VA(200,"HASH")
-        X ^VA(200,"HASH",TOHASH)
-        quit     ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        Set U="^"
+        Set TOHASH=$S(TOHASH="PBKDF2":"PBKDF2,1:"NONE")
+                Set U="^"
         ; ---------------------------------------------------------
         ; Copy/Backup ^VA(200) before modifying default HASH
         Set NOW=$$NOW^XLFDT,NODE="^XTMP(""VWH VA(200) "_NOW_""","
@@ -115,6 +111,7 @@ CONVERT ; Allows "NONE" or "PBKDF2"
         Merge @(NODE_"200)")=^VA(200)
         ; ---------------------------------------------------------
         ;
+        DO SET(TOHASH)
         ; Access Code and "A" cross reference:
         Kill ^VA(200,"A") ;;                                                                      < KILLING "A" >
         Set D0=.99
@@ -159,7 +156,7 @@ AOLD    ; "AOLD" cross reference
         ;
 MK(X)   ;
         IF FROMHASH="LEGACY" W !,X S X=$$UN(X) W "   "_X QUIT:TOHASH="NONE" X
-        Set X=$$CMD^XUSHSH(PYTHON,PARAMS,X)
+        Set X=$$EN^XUSHSH(X)
          W "  "_X
         Q X
         ;

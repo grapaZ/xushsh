@@ -1,4 +1,4 @@
-XUSHSH  ;IA/GpZ-ROBUST(PBKDF2)HASHING UTILITY v1.0; 10/1/12 6:26pm
+XUSHSH  ;IA/GpZ-ROBUST(PBKDF2)HASHING UTILITY v1.0; 10/11/2012;
 V       ;;8.0;KERNEL;;Jul 10, 1995
         ;
         ;
@@ -18,12 +18,14 @@ A       SET X=$$EN(X) QUIT
         ;
 EN(X)   ;
         NEW VWCALL
-        XECUTE ^VA(200,"VWHSH")  
+        XECUTE ^VA(200,"VWHSH")
+        ;SET VWCALL="C:\Python27\python C:\Python27\xushsh.py --data="_X
+        ; hardcoded option.
         QUIT:$L($G(VWCALL))=0 X  ;Short circuit to support LEGACY or NULL hash.
-        QUIT $$HOSTPIPE(VWCALL)
+        QUIT $$OS(VWCALL)
         ;
         ; -----------Cache-PIPE-WaveWand------------
-HOSTPIPE(CALL) ;
+OS(CALL) ;
         New ZUT,X
         Set ZUT=$ZUTIL(68,40,1)
         Open CALL:"Q"  Use CALL Read X

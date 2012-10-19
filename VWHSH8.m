@@ -1,4 +1,4 @@
-XUSHSH  ;IA/GpZ-ROBUST(PBKDF2)HASHING UTILITY v1.0; 10/1/12 6:26pm
+XUSHSH  ;IA/GpZ-ROBUST(PBKDF2)HASHING UTILITY v1.0; 10/11/2012;
 V       ;;8.0;KERNEL;;Jul 10, 1995
         ;
         ;
@@ -19,15 +19,16 @@ A       SET X=$$EN(X) QUIT
 EN(X)   ;
         NEW VWCALL
         XECUTE ^VA(200,"VWHSH")  
+        ;SET VWCALL="python /home/vista/bin/xushsh.py --data="_X
+        ; hardcoded option.
         QUIT:$L($G(VWCALL))=0 X  ;Short circuit to support LEGACY or NULL hash.
-        QUIT $$HOSTPIPE(VWCALL)
+        QUIT $$OS(VWCALL)
         ;
         ; -----------GT.M-PIPE-Magic----------------
-HOSTPIPE(CALL) ;
+OS(CALL) ;
         New X
         Open "PIPE":(command=CALL:READONLY)::"PIPE"
         Use "PIPE" READ X
         Close "PIPE"
         Use 0
         QUIT X
-        
