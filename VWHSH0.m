@@ -7,6 +7,8 @@ V       ;;8.0;KERNEL;;Jul 10, 1995
         ; MOVEIN : Install VWXHSH --> XUSHSH
         ; SET() : Change hash
         ; CONVERT("PBKDF2" or "NONE")
+        ; REVERT : Roll back conversion to previous state
+        ; KILL : Remove VA(200) backup global node
         ;
         ; -------------------------------------
 TEST    ; What hash is installed?
@@ -41,7 +43,6 @@ BUILD(DEFAULT)  ; Set up calls for LEGACY, NONE/NULL, PBKDF2 hashes
         ; PBKDF2 SET VWCALL=VWCALL_" --data="""_X_""""
         ;
         Set HASH=$Select($ZV["Linux":HASH("LINUX"),1:HASH("WINDOWS"))
-        Kill HASH("LINUX"),HASH("WINDOWS")
         Kill ^VA(200,"VWHSH") Merge ^VA(200,"VWHSH")=HASH
         DO SET(DEFAULT)
         QUIT
@@ -86,15 +87,11 @@ KILL    ;
         . Quit
         Quit
         ;
-CONVERT ; Allows "NONE" or "PBKDF2"
-        ;New %H,X,Y,Z,HSH,ACODE,AOLD,FROM,VCODE,VOLD,D0,NODE,NOW,XT
+CONVERT(TOHASH) ; Allows "NONE" or "PBKDF2"
+        New %H,X,Y,Z,HSH,ACODE,AOLD,FROM,VCODE,VOLD,D0,NODE,NOW,XT
         Do TEST^VWHSH0
         Set FROMHASH=HASH
-        Set TOHASH="NONE"
-        ;;Set X="test"
-        X ^VA(200,"HASH")
-        X ^VA(200,"HASH",TOHASH)
-        quit     ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        Set TOHASH=$S(TOHASH="PBKDF2":"PBKDF2",1:"NONE")
         Set U="^"
         ; ---------------------------------------------------------
         ; Copy/Backup ^VA(200) before modifying default HASH
@@ -102,6 +99,8 @@ CONVERT ; Allows "NONE" or "PBKDF2"
         Set @(NODE_"0)")=$$FMADD^XLFDT($$DT^XLFDT,2,0,0,0)_U_NOW_U_FROMHASH
         Merge @(NODE_"200)")=^VA(200)
         ; ---------------------------------------------------------
+        ;
+        DO SET(TOHASH)  ; $$EN^XUSHSH() Will be used to make the conversions.
         ;
         ; Access Code and "A" cross reference:
         Kill ^VA(200,"A") ;;                                                                      < KILLING "A" >
@@ -147,7 +146,7 @@ AOLD    ; "AOLD" cross reference
         ;
 MK(X)   ;
         IF FROMHASH="LEGACY" W !,X S X=$$UN(X) W "   "_X QUIT:TOHASH="NONE" X
-        Set X=$$CMD^XUSHSH(PYTHON,PARAMS,X)
+        Set X=$$EN^XUSHSH(X)
          W "  "_X
         Q X
         ;
