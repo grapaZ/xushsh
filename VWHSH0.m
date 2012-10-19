@@ -1,12 +1,12 @@
-VWHSH0  ;IOWA/GpZ- IMPROVED HASHING UTILITY v0.9 MAIN INSTALL MODULE; 10/17/12;
+VWHSH0  ;IOWA/GpZ- IMPROVED HASHING UTILITY v0.9 MAIN INSTALL MODULE; 10/18/12 9:13pm; 10/19/12 11:50am
 V       ;;8.0;KERNEL;;Jul 10, 1995
         ;;
         ; -------------------------------------
         ; TEST : Check current installation.
-        ; SAVEOLD : Move XUSHSH --> VWHSHLEG
         ; BUILD() : Write ^VA(200,"VWHSH"),^%ZOSF("VWHSH") array (duplicate)
         ; MOVEIN : Install VWXHSH --> XUSHSH
-        ; BUILD("PBKPLUS") : post conversion adjustment
+        ; SET() : Change hash
+        ; CONVERT("PBKDF2" or "NONE")
         ;
         ; -------------------------------------
 TEST    ; What hash is installed?
@@ -30,36 +30,24 @@ TEST    ; What hash is installed?
         Write !,"OK, current HASH is identified as ",HASH,".",!
         Quit
         ; -------------------------------------
-SAVEOLD ; Archive current version of XUSHSH to VWHSHLEG
-        If $L($Text(^VWHSHLEG)) Do  Quit
-        . Write "Archive routine ^VWHSHLEG already exists.",!
-        . Write "Must be deleted or renamed before this installation can continue.",!
-        . Quit
-        Set U="^",SCR="I 1",MUMPS=^%ZOSF("OS"),ZTOS=$S(MUMPS["GT.M":8,MUMPS["OpenM":3)
-        Set %S="XUSHSH",%D="VWHSHLEG"
-        Do MOVE^ZTMGRSET
-        Quit
-        ;
-        ; -------------------------------------
-BUILD(DEFAULT)  ; Set up defaults for LEGACY, NONE/NULL, PBKDF2 hashes
+BUILD(DEFAULT)  ; Set up calls for LEGACY, NONE/NULL, PBKDF2 hashes
         New X,I
         Set:'$L($G(DEFAULT)) DEFAULT="LEGACY"
         For I=4:1:8 Set X=$P($Text(BUILD+I),"; ",2,99) Set HASH($P(X," ",1))=$P(X," ",2,99)
-        ; LINUX SET VWCALL="python /home/vista/bin/xushsh.py --input="_X XECUTE ^VA(200,"VWHSH","LEGACY")
-        ; WINDOWS Set VWCALL="C:\Python27\python C:\Python27\xushsh.py --input="_X XECUTE ^VA(200,"VWHSH","LEGACY")
+        ; LINUX SET VWCALL="python /home/vista/bin/xushsh.py" XECUTE
+        ; WINDOWS Set VWCALL="C:\Python27\python C:\Python27\xushsh.py" XECUTE
         ; LEGACY KILL VWCALL SET X=$$EN^VWHSHLEG(X)
         ; NONE KILL VWCALL
-        ; PBKDF2 SET VWCALL=VWCALL_" --hash=pbkdf2" XECUTE ^VA(200,"VWHSH","SALT")
+        ; PBKDF2 SET VWCALL=VWCALL_" --data="""_X_""""
         ;
         Set HASH=$Select($ZV["Linux":HASH("LINUX"),1:HASH("WINDOWS"))
         Kill HASH("LINUX"),HASH("WINDOWS")
-        Set HASH(0)=HASH(DEFAULT)
-        ;;Kill ^%ZOSF("VWHSH") Merge ^%ZOSF("VWHSH")=HASH
         Kill ^VA(200,"VWHSH") Merge ^VA(200,"VWHSH")=HASH
+        DO SET(DEFAULT)
         QUIT
         ;
-RESET(DEFAULT) ; Change only top node
-        Set ^VA(200,"VWHSH",0)=^VA(200,"VWHSH",DEFAULT)
+SET(DEFAULT) ; Change only top node
+        Set $P(^VA(200,"VWHSH"),"XECUTE",2)=" ^VA(200,""VWHSH"","""_DEFAULT_""")"
         QUIT
         ; -------------------------------------
 MOVEIN  ;
@@ -98,12 +86,16 @@ KILL    ;
         . Quit
         Quit
         ;
-CONVERT(TOHASH) ; Allows "NONE" or "PBKDF2"
-        New %H,X,Y,Z,HSH,ACODE,AOLD,FROM,VCODE,VOLD,D0,NODE,NOW,XT
+CONVERT ; Allows "NONE" or "PBKDF2"
+        ;New %H,X,Y,Z,HSH,ACODE,AOLD,FROM,VCODE,VOLD,D0,NODE,NOW,XT
         Do TEST^VWHSH0
         Set FROMHASH=HASH
-        Set TOHASH=$S(TOHASH="PBKDF2":"PBKDF2,1:"NONE")
-                Set U="^"
+        Set TOHASH="NONE"
+        ;;Set X="test"
+        X ^VA(200,"HASH")
+        X ^VA(200,"HASH",TOHASH)
+        quit     ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        Set U="^"
         ; ---------------------------------------------------------
         ; Copy/Backup ^VA(200) before modifying default HASH
         Set NOW=$$NOW^XLFDT,NODE="^XTMP(""VWH VA(200) "_NOW_""","
@@ -111,7 +103,6 @@ CONVERT(TOHASH) ; Allows "NONE" or "PBKDF2"
         Merge @(NODE_"200)")=^VA(200)
         ; ---------------------------------------------------------
         ;
-        DO SET(TOHASH)
         ; Access Code and "A" cross reference:
         Kill ^VA(200,"A") ;;                                                                      < KILLING "A" >
         Set D0=.99
@@ -156,7 +147,7 @@ AOLD    ; "AOLD" cross reference
         ;
 MK(X)   ;
         IF FROMHASH="LEGACY" W !,X S X=$$UN(X) W "   "_X QUIT:TOHASH="NONE" X
-        Set X=$$EN^XUSHSH(X)
+        Set X=$$CMD^XUSHSH(PYTHON,PARAMS,X)
          W "  "_X
         Q X
         ;
