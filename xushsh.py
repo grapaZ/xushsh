@@ -75,7 +75,7 @@ for opt, arg in options:
     if opt in ('-s', '--salt'):
         salt = str(arg)
     if opt in ('-i', '--iterations'):
-        cycles = str(arg)
+        cycles = int(arg)
     if opt in ('-s', '--salt'):
         salt = str(arg)
     if opt in ('-k', '--keylen'):
