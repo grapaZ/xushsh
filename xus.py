@@ -197,12 +197,14 @@ exit()
   Author: Magnus Hallin
   Home Page: http://bitbucket.org/mhallin/py-scrypt
   License: 2-clause BSD
-  From https://pypi.python.org/packages/source/s/scrypt/scrypt-0.6.1.tar.gz
+  wget https://pypi.python.org/packages/source/s/scrypt/scrypt-0.6.1.tar.gz
+  tar zxvf scrypt-0.6.1.tar.gz
+
 	$ cd py-scrypt
 	$ python setup.py build
 
 	Become superuser (or use virtualenv):
-	# python setup.py install
+	$ sudo python setup.py install
 
 	Run tests after install:
 	$ python setup.py test
